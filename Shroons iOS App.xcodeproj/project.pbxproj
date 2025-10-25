@@ -11,11 +11,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		8930A1A42EAC197600411874 /* Cards */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Cards;
-			sourceTree = "<group>";
-		};
 		8989EA6B2EABC37B00800988 /* Shroons iOS App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Shroons iOS App";
@@ -39,7 +34,6 @@
 			children = (
 				8989EA6B2EABC37B00800988 /* Shroons iOS App */,
 				8989EA6A2EABC37B00800988 /* Products */,
-				8930A1A42EAC197600411874 /* Cards */,
 			);
 			sourceTree = "<group>";
 		};
@@ -67,7 +61,6 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				8930A1A42EAC197600411874 /* Cards */,
 				8989EA6B2EABC37B00800988 /* Shroons iOS App */,
 			);
 			name = "Shroons iOS App";
