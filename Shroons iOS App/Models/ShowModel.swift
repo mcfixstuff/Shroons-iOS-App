@@ -1,61 +1,64 @@
-//
-//  ShowModel.swift
-//  Shroons iOS App
-//
-//  Created by Eric on 10/24/25.
-//
+// Models.swift
 
 import Foundation
+import SwiftUI
 
+// MARK: - Show Data Model
 struct Show: Identifiable, Codable {
-    var id = UUID()
+    let id: Int
     let title: String
-    let date: Date
     let location: String?
-    let additionalInfo: String?
+    let date_time: Date
+    let additional_information: String?
     let cost: Int?
-    let youtubeLink: URL?
-    let isImportant: Bool
+    let is_important: Bool
+    let youtube_link: String?
+    let poster_url: String?
+    let ticket_link: String?
 
-    /// Computed property to determine if the show is upcoming or past
-    var isPast: Bool {
-        return date < Date()
-    }
+    var isPast: Bool { date_time < Date() }
 
-    /// A short, formatted date string for UI display
     var formattedDate: String {
-        date.formatted(date: .abbreviated, time: .omitted)
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: date_time)
     }
 }
 
-extension Show {
-    static let sampleShows: [Show] = [
-        Show(
-            title: "Shroonstock",
-            date: Calendar.current.date(byAdding: .day, value: 10, to: Date())!,
-            location: "Los Angeles, CA",
-            additionalInfo: "Outdoor festival — bring chairs!",
-            cost: 25,
-            youtubeLink: URL(string: "https://youtube.com/watch?v=dQw4w9WgXcQ"),
-            isImportant: true
-        ),
-        Show(
-            title: "Forest Vibes",
-            date: Calendar.current.date(byAdding: .day, value: -5, to: Date())!,
-            location: "Portland, OR",
-            additionalInfo: nil,
-            cost: nil,
-            youtubeLink: nil,
-            isImportant: false
-        ),
-        Show(
-            title: "Mushroon Jam",
-            date: Calendar.current.date(byAdding: .day, value: 30, to: Date())!,
-            location: "Seattle, WA",
-            additionalInfo: "21+ show — ID required",
-            cost: 15,
-            youtubeLink: nil,
-            isImportant: true
-        )
-    ]
+struct ShowsResponse: Codable {
+    let upcoming: [Show]
+    let past: [Show]
+}
+import Combine
+// MARK: - View Model
+@MainActor
+class ShowsViewModel: ObservableObject {
+    @Published var upcoming: [Show] = []
+    @Published var past: [Show] = []
+    @Published var isLoading = false
+    @Published var errorMessage: String?
+
+    func fetchShows() async {
+        guard let url = URL(string: "https://shroons.com/api/shows/") else { return }
+
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+
+            let response = try decoder.decode(ShowsResponse.self, from: data)
+
+            upcoming = response.upcoming
+            past = response.past
+        } catch {
+            print("Error fetching shows:", error)
+            errorMessage = "Could not load shows."
+        }
+
+        isLoading = false
+    }
 }

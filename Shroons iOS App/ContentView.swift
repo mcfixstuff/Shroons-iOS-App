@@ -14,6 +14,11 @@ struct ContentView: View {
                 .tabItem {
                     Label("Shows", systemImage: "calendar")
                 }
+
+            AboutView()
+                .tabItem {
+                    Label("About", systemImage: "info.circle")
+                }
         }
     }
 }
