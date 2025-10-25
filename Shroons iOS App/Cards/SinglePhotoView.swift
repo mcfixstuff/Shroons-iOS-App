@@ -1,44 +1,44 @@
-//
-//  SinglePhotoView.swift
-//  Shroons iOS App
-//
-//  Created by Eric on 10/25/25.
-//
-
 import SwiftUI
 import PhotosUI
 
 struct SinglePhotoView: View {
     let imageURL: String
     @Environment(\.dismiss) var dismiss
+    @State private var showingSaveError = false
+    @State private var saveErrorMessage = ""
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
             Color.black.ignoresSafeArea()
 
-            AsyncImage(url: URL(string: imageURL)) { image in
-                image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .ignoresSafeArea()
-            } placeholder: {
-                ProgressView().tint(.white)
-            }
-
-            VStack {
-                HStack {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
+            AsyncImage(url: URL(string: imageURL)) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .ignoresSafeArea()
+                case .failure:
+                    VStack {
+                        Image(systemName: "exclamationmark.triangle")
+                            .foregroundColor(.red)
+                            .font(.largeTitle)
+                        Text("Failed to load image")
                             .foregroundColor(.white)
-                            .font(.title)
                             .padding()
                     }
+                case .empty:
+                    ProgressView().tint(.white)
+                @unknown default:
+                    ProgressView().tint(.white)
+                }
+            }
 
-                    Spacer()
-
+            HStack {
+                Spacer()
+                VStack {
+                    // Note: Back button is provided by NavigationView, so no explicit dismiss button needed
                     Button {
                         saveToPhotos()
                     } label: {
@@ -48,22 +48,61 @@ struct SinglePhotoView: View {
                             .padding()
                     }
                 }
-                Spacer()
+                .padding(.top, 16)
+                .padding(.trailing, 16)
             }
+        }
+        .navigationBarBackButtonHidden(false) // Ensure back button is visible
+        .alert("Error", isPresented: $showingSaveError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(saveErrorMessage)
         }
     }
 
     // MARK: - Save Image to Photos
     func saveToPhotos() {
-        guard let url = URL(string: imageURL) else { return }
-        Task {
-            do {
-                let (data, _) = try await URLSession.shared.data(from: url)
-                if let uiImage = UIImage(data: data) {
-                    UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
+        PHPhotoLibrary.requestAuthorization { status in
+            switch status {
+            case .authorized, .limited:
+                Task {
+                    do {
+                        guard let url = URL(string: imageURL) else {
+                            await MainActor.run {
+                                saveErrorMessage = "Invalid image URL."
+                                showingSaveError = true
+                            }
+                            return
+                        }
+                        let config = URLSessionConfiguration.default
+                        config.requestCachePolicy = .returnCacheDataElseLoad
+                        let session = URLSession(configuration: config)
+                        let (data, _) = try await session.data(from: url)
+                        guard let uiImage = UIImage(data: data) else {
+                            await MainActor.run {
+                                saveErrorMessage = "Failed to process image data."
+                                showingSaveError = true
+                            }
+                            return
+                        }
+                        UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
+                    } catch {
+                        await MainActor.run {
+                            saveErrorMessage = "Error saving image: \(error.localizedDescription)"
+                            showingSaveError = true
+                        }
+                    }
                 }
-            } catch {
-                print("Error saving image: \(error)")
+            case .denied, .restricted:
+                Task { @MainActor in
+                    saveErrorMessage = "Photo library access denied. Please enable it in Settings."
+                    showingSaveError = true
+                }
+            default:
+                Task { @MainActor in
+                    saveErrorMessage = "Unable to save image. Please try again."
+                    showingSaveError = true
+                }
             }
         }
     }

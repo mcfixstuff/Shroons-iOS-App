@@ -2,8 +2,6 @@ import SwiftUI
 
 struct ShowsView: View {
     @StateObject private var viewModel = ShowsViewModel()
-    @State private var selectedShow: Show? = nil
-    @State private var isShowingDetail = false
 
     var body: some View {
         NavigationView {
@@ -28,11 +26,13 @@ struct ShowsView: View {
                                 .bold()
                                 .padding(.horizontal)
                             ForEach(viewModel.upcoming) { show in
-                                ShowCard(show: show)
-                                    .onTapGesture {
-                                        selectedShow = show
-                                        isShowingDetail = true
+                                NavigationLink(
+                                    destination: ShowDetailView(show: show),
+                                    label: {
+                                        ShowCard(show: show)
+                                            .foregroundColor(.primary)
                                     }
+                                )
                             }
                         }
 
@@ -42,11 +42,13 @@ struct ShowsView: View {
                                 .bold()
                                 .padding(.horizontal)
                             ForEach(viewModel.past) { show in
-                                ShowCard(show: show)
-                                    .onTapGesture {
-                                        selectedShow = show
-                                        isShowingDetail = true
+                                NavigationLink(
+                                    destination: ShowDetailView(show: show),
+                                    label: {
+                                        ShowCard(show: show)
+                                            .foregroundColor(.primary)
                                     }
+                                )
                             }
                         }
                     }
@@ -56,13 +58,6 @@ struct ShowsView: View {
             .navigationTitle("The Shroons Shows")
             .task {
                 await viewModel.fetchShows()
-            }
-            .sheet(isPresented: $isShowingDetail) {
-                if let show = selectedShow {
-                    ShowDetailView(show: show)
-                        .presentationDetents([.medium, .large])
-                        .presentationDragIndicator(.visible)
-                }
             }
         }
     }

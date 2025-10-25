@@ -9,9 +9,6 @@ import SwiftUI
 
 struct GalleryView: View {
     @StateObject private var viewModel = GalleryViewModel()
-    @State private var selectedCollection: GalleryCollection? = nil
-    @State private var showDetail = false
-
     private let columns = [
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible(), spacing: 12)
@@ -40,43 +37,43 @@ struct GalleryView: View {
                     ScrollView {
                         LazyVGrid(columns: columns, spacing: 16) {
                             ForEach(viewModel.collections) { collection in
-                                Button {
-                                    selectedCollection = collection
-                                    showDetail = true
-                                } label: {
-                                    VStack(spacing: 0) {
-                                        GeometryReader { geometry in
-                                            let width = geometry.size.width
-                                            let height = width * 2/3 // 3:2 ratio
-                                            
-                                            ZStack {
-                                                if let url = URL(string: "https://shroons.com" + collection.thumbnail) {
-                                                    AsyncImage(url: url) { image in
-                                                        image
-                                                            .resizable()
-                                                            .scaledToFill()
-                                                            .frame(width: width, height: height)
-                                                            .clipped()
-                                                    } placeholder: {
-                                                        Rectangle()
-                                                            .fill(Color.gray.opacity(0.2))
-                                                            .frame(width: width, height: height)
-                                                            .overlay(ProgressView())
+                                NavigationLink(
+                                    destination: GalleryDetailView(collection: collection),
+                                    label: {
+                                        VStack(spacing: 0) {
+                                            GeometryReader { geometry in
+                                                let width = geometry.size.width
+                                                let height = width * 2/3 // 3:2 ratio
+                                                
+                                                ZStack {
+                                                    if let url = URL(string: "https://shroons.com" + collection.thumbnail) {
+                                                        AsyncImage(url: url) { image in
+                                                            image
+                                                                .resizable()
+                                                                .scaledToFill()
+                                                                .frame(width: width, height: height)
+                                                                .clipped()
+                                                        } placeholder: {
+                                                            Rectangle()
+                                                                .fill(Color.gray.opacity(0.2))
+                                                                .frame(width: width, height: height)
+                                                                .overlay(ProgressView())
+                                                        }
                                                     }
                                                 }
+                                                .cornerRadius(12)
                                             }
-                                            .cornerRadius(12)
+                                            .aspectRatio(3/2, contentMode: .fit)
+                                            
+                                            Text(collection.name)
+                                                .font(.subheadline)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(.primary)
+                                                .lineLimit(1)
+                                                .padding(.top, 6)
                                         }
-                                        .aspectRatio(3/2, contentMode: .fit)
-                                        
-                                        Text(collection.name)
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                            .foregroundColor(.primary)
-                                            .lineLimit(1)
-                                            .padding(.top, 6)
                                     }
-                                }
+                                )
                                 .buttonStyle(.plain)
                             }
                         }
@@ -84,12 +81,6 @@ struct GalleryView: View {
                         .padding(.top, 8)
                     }
                     .navigationTitle("Gallery")
-                    .sheet(isPresented: $showDetail) {
-                        if let collection = selectedCollection {
-                            GalleryDetailView(collection: collection)
-                                .presentationDetents([.medium, .large])
-                        }
-                    }
                 }
             }
             .task {
