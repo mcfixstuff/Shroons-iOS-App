@@ -14,7 +14,7 @@ struct ShowDetailView: View {
         ScrollView {
             VStack(spacing: 20) {
                 // Poster Image
-                if let posterURL = show.poster_url, let url = URL(string: posterURL) {
+                if let posterURL = show.poster_url, let _ = URL(string: posterURL) {
                     AsyncImage(url: URL(string: show.poster_url ?? "")) { image in
                         image
                             .resizable()
