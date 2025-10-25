@@ -2,45 +2,42 @@
 //  ShowDetailView.swift
 //  Shroons iOS App
 //
-//  Created by Eric on 10/24/25.
-//
 
 import SwiftUI
 
 struct ShowDetailView: View {
     var show: Show
-    
+    private let baseURL = "https://shroons.com" // Base URL for your server
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Poster Image
-                if let posterURL = show.poster_url, let _ = URL(string: posterURL) {
-                    AsyncImage(url: URL(string: show.poster_url ?? "")) { image in
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .cornerRadius(16)
-                    } placeholder: {
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(height: 200)
-                            .cornerRadius(16)
-                            .overlay(
-                                Image(systemName: "photo")
-                                    .font(.largeTitle)
-                                    .foregroundColor(.white.opacity(0.7))
-                            )
+                
+                // Poster Image (only if available)
+                if let posterString = show.poster_url {
+                    let fullURLString = posterString.starts(with: "http") ? posterString : baseURL + posterString
+                    if let posterURL = URL(string: fullURLString) {
+                        AsyncImage(url: posterURL) { image in
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxWidth: .infinity)
+                                .cornerRadius(16)
+                        } placeholder: {
+                            ProgressView() // simple loading indicator
+                                .frame(height: 250)
+                        }
+                        .padding(.horizontal)
                     }
-                    .frame(maxWidth: .infinity)
-
                 }
-
+                
                 // Title & Location
                 VStack(alignment: .leading, spacing: 8) {
                     Text(show.title)
                         .font(.title)
                         .bold()
-                    if let location = show.location {
+                    
+                    if let location = show.location, !location.isEmpty {
                         Text(location)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
@@ -70,8 +67,9 @@ struct ShowDetailView: View {
                         .font(.body)
                         .padding(.horizontal)
                 }
-                // Ticket Link
-                if let ticket = show.ticket_link, let url = URL(string: ticket) {
+                
+                // Ticket Link (only for upcoming shows)
+                if !show.isPast, let ticket = show.ticket_link, let url = URL(string: ticket) {
                     Link(destination: url) {
                         Text("Purchase Tickets")
                             .font(.headline)
@@ -106,13 +104,12 @@ struct ShowDetailView: View {
             }
             .padding(.top)
         }
-        .presentationDetents([.fraction(0.6), .medium, .large]) // iOS 16+ / 17 bottom sheet
+        .presentationDetents([.fraction(0.6), .medium, .large])
         .presentationDragIndicator(.visible)
     }
 }
 
 #Preview {
-    // Sample show data matching your API example
     let sampleShow = Show(
         id: 71,
         title: "Halloween Show",
@@ -122,8 +119,8 @@ struct ShowDetailView: View {
         cost: 0,
         is_important: false,
         youtube_link: nil,
-        poster_url: nil,
-        ticket_link: nil
+        poster_url: nil, // no image for preview
+        ticket_link: "https://shroons.com/tickets/halloween"
     )
     
     ShowDetailView(show: sampleShow)
