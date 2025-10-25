@@ -3,7 +3,7 @@ import PhotosUI
 
 struct SinglePhotoView: View {
     let imageURL: String
-    @Environment(\.dismiss) var dismiss
+    @State private var isSaved = false
     @State private var showingSaveError = false
     @State private var saveErrorMessage = ""
 
@@ -38,14 +38,21 @@ struct SinglePhotoView: View {
             HStack {
                 Spacer()
                 VStack {
-                    // Note: Back button is provided by NavigationView, so no explicit dismiss button needed
-                    Button {
-                        saveToPhotos()
-                    } label: {
-                        Image(systemName: "square.and.arrow.down")
-                            .foregroundColor(.white)
+                    if isSaved {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
                             .font(.title2)
                             .padding()
+                    } else {
+                        Button(action: {
+                            print("Tapped Save to Photos for image: \(imageURL)") // Debug
+                            saveToPhotos()
+                        }) {
+                            Image(systemName: "square.and.arrow.down")
+                                .foregroundColor(.white)
+                                .font(.title2)
+                                .padding()
+                        }
                     }
                 }
                 .padding(.top, 16)
@@ -61,7 +68,7 @@ struct SinglePhotoView: View {
     }
 
     // MARK: - Save Image to Photos
-    func saveToPhotos() {
+    private func saveToPhotos() {
         PHPhotoLibrary.requestAuthorization { status in
             switch status {
             case .authorized, .limited:
@@ -86,6 +93,10 @@ struct SinglePhotoView: View {
                             return
                         }
                         UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
+                        await MainActor.run {
+                            isSaved = true // Switch to checkmark
+                            print("Image saved successfully: \(imageURL)") // Debug
+                        }
                     } catch {
                         await MainActor.run {
                             saveErrorMessage = "Error saving image: \(error.localizedDescription)"
