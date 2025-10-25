@@ -19,6 +19,10 @@ struct ContentView: View {
                 .tabItem {
                     Label("About", systemImage: "info.circle")
                 }
+            GalleryView()
+                .tabItem {
+                    Label("Gallery", systemImage: "camera")
+                }
         }
     }
 }
