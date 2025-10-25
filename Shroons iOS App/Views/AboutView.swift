@@ -72,6 +72,9 @@ Stay tuned for upcoming shows, releases and more. The journey’s just getting s
                     TikTokButton()
                     YouTubeButton(channelHandle: "theshroons")
                            YouTubeButton(channelHandle: "TheShroonsVault")
+                    FacebookButton()
+                    SpotifyButton()
+                    BandcampButton()
                 }
                 .padding(.horizontal)
 
