@@ -19,6 +19,10 @@ struct ContentView: View {
                 .tabItem {
                     Label("Gallery", systemImage: "camera")
                 }
+            ReleasesView()
+                .tabItem {
+                    Label("Releases", systemImage: "music.note")
+                }
             
             AboutView()
                 .tabItem {
