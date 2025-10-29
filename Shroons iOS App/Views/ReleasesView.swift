@@ -10,6 +10,13 @@ import SwiftUI
 struct ReleasesView: View {
     let songs = [
         Song(
+            title: "Torch",
+            artist: "The Shroons",
+            spotifyURL: URL(string: "https://open.spotify.com/track/1d0JlbMJlpXHyc0RxSddsD")!,
+            previewURL: URL(string: "https://shroons.com/media/songs/Torch.mp3")!,
+            artworkURL: URL(string: "https://shroons.com/media/songs/Torch.jpg")
+        ),
+        Song(
             title: "Nerve",
             artist: "The Shroons",
             spotifyURL: URL(string: "https://open.spotify.com/track/347J4h7whRlX4EFFIuwA0j")!,
