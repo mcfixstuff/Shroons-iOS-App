@@ -39,6 +39,7 @@ struct ReleasesView: View {
                     ForEach(songs) { song in
                         SpotifyPreviewButton(song: song)
                     }
+                    SpotifyButton()
                 }
                 .padding()
             }.navigationTitle("Releases")

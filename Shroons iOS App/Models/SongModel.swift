@@ -5,13 +5,13 @@
 //  Created by Eric on 10/29/25.
 //
 
-import SwiftUI
+import Foundation
 
 struct Song: Identifiable {
-    let id = UUID()
+    let id = UUID().uuidString
     let title: String
     let artist: String
     let spotifyURL: URL
-    let previewURL: URL   // your hosted MP3
-    let artworkURL: URL?  // optional album art
+    let previewURL: URL
+    let artworkURL: URL?
 }
