@@ -12,16 +12,23 @@ struct ReleasesView: View {
         Song(
             title: "Nerve",
             artist: "The Shroons",
-            spotifyURL: URL(string: "https://open.spotify.com/track/1d0JlbMJlpXHyc0RxSddsD")!,
+            spotifyURL: URL(string: "https://open.spotify.com/track/347J4h7whRlX4EFFIuwA0j")!,
             previewURL: URL(string: "https://shroons.com/media/songs/Nerve.mp3")!,
-            artworkURL: URL(string: "https://shroons.com/media/artwork/surfing_in_the_rain.jpg")
+            artworkURL: URL(string: "https://shroons.com/media/songs/Nerve.png")
         ),
         Song(
-            title: "Midnight Drive",
+            title: "The Hatred",
             artist: "The Shroons",
-            spotifyURL: URL(string: "https://open.spotify.com/track/2abc123...")!,
-            previewURL: URL(string: "https://shroons.com/media/previews/midnight_drive.mp3")!,
-            artworkURL: nil
+            spotifyURL: URL(string: "https://open.spotify.com/track/3SeqIOcMzlTLJkkL3UDXvk")!,
+            previewURL: URL(string: "https://shroons.com/media/songs/The%20Hatred.mp3")!,
+            artworkURL: URL(string: "https://shroons.com/media/songs/The%20Hatred.jpg")!,
+        )
+        Song(
+            title: "Rat King",
+            artist: "The Shroons",
+            spotifyURL: URL(string: "https://open.spotify.com/track/5xscTBoa4N1uVWrsrJQISx")!,
+            previewURL: URL(string: "https://shroons.com/media/songs/Rat%20King.mp3")!,
+            artworkURL: URL(string: "https://shroons.com/media/songs/Rat%20King.png")!,
         )
     ]
 
