@@ -22,7 +22,7 @@ struct ReleasesView: View {
             spotifyURL: URL(string: "https://open.spotify.com/track/3SeqIOcMzlTLJkkL3UDXvk")!,
             previewURL: URL(string: "https://shroons.com/media/songs/The%20Hatred.mp3")!,
             artworkURL: URL(string: "https://shroons.com/media/songs/The%20Hatred.jpg")!,
-        )
+        ),
         Song(
             title: "Rat King",
             artist: "The Shroons",
@@ -33,13 +33,19 @@ struct ReleasesView: View {
     ]
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                ForEach(songs) { song in
-                    SpotifyPreviewButton(song: song)
+        NavigationView{
+            ScrollView {
+                VStack(spacing: 16) {
+                    ForEach(songs) { song in
+                        SpotifyPreviewButton(song: song)
+                    }
                 }
-            }
-            .padding()
+                .padding()
+            }.navigationTitle("Releases")
         }
+        
     }
+}
+#Preview {
+    ReleasesView()
 }
