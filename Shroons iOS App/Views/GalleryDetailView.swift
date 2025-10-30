@@ -17,22 +17,33 @@ struct GalleryDetailView: View {
             } else {
                 LazyVStack(spacing: 16) {
                     ForEach(images, id: \.self) { img in
+                        let smallImageURL = makeSmallVersion(of: img)
+                        let baseURL = "https://shroons.com"
+
                         NavigationLink(
-                            destination: SinglePhotoView(imageURL: "https://shroons.com" + img),
+                            destination: SinglePhotoView(imageURL: baseURL + img),
                             label: {
-                                AsyncImage(url: URL(string: "https://shroons.com" + img)) { image in
-                                    image
-                                        .resizable()
-                                        .scaledToFit()
-                                        .cornerRadius(12)
-                                        .shadow(radius: 4)
-                                } placeholder: {
-                                    Rectangle()
-                                        .fill(Color.gray.opacity(0.1))
-                                        .aspectRatio(3/2, contentMode: .fit)
-                                        .cornerRadius(12)
-                                        .overlay(ProgressView())
-                                }
+                                // Try small version first
+                                RetryAsyncImage(
+                                    url: URL(string: baseURL + smallImageURL)!,
+                                    maxRetries: 3,
+                                    retryDelay: 1.5
+                                )
+                                .aspectRatio(3/2, contentMode: .fit)
+                                .cornerRadius(12)
+                                .shadow(radius: 4)
+                                .background(
+                                    // Fallback: full image if small fails
+                                    RetryAsyncImage(
+                                        url: URL(string: baseURL + img)!,
+                                        maxRetries: 2,
+                                        retryDelay: 1.0
+                                    )
+                                    .aspectRatio(3/2, contentMode: .fit)
+                                    .opacity(0) // invisible until needed
+                                    .allowsHitTesting(false)
+                                )
+                                .clipped()
                             }
                         )
                         .buttonStyle(.plain)
@@ -47,43 +58,45 @@ struct GalleryDetailView: View {
         }
     }
 
-    // MARK: - Load Images for this Collection
+    // MARK: - Load Images
     private func fetchImages() async {
-        guard let encodedCollectionName = collection.name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
-              let url = URL(string: "https://shroons.com/api/gallery/photos/\(encodedCollectionName)/") else {
-            print("Invalid URL for collection: \(collection.name)")
-            isLoading = false
+        guard let encodedName = collection.name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
+              let url = URL(string: "https://shroons.com/api/gallery/photos/\(encodedName)/") else {
+            await MainActor.run { isLoading = false }
             return
         }
 
         do {
             let config = URLSessionConfiguration.default
             config.requestCachePolicy = .returnCacheDataElseLoad
-            let session = URLSession(configuration: config)
-            let (data, _) = try await session.data(from: url)
-            print("Received data for URL: \(url)") // Debug
+            let (data, _) = try await URLSession(configuration: config).data(from: url)
             let decoded = try JSONDecoder().decode(PhotosResponse.self, from: data)
             await MainActor.run {
                 images = decoded.photos
                 isLoading = false
             }
         } catch {
-            print("Failed to load collection images: \(error)")
-            await MainActor.run {
-                isLoading = false
-            }
+            print("Failed to load images: \(error)")
+            await MainActor.run { isLoading = false }
         }
+    }
+
+    // MARK: - Helper: Create _small version
+    private func makeSmallVersion(of path: String) -> String {
+        guard let dotIndex = path.lastIndex(of: ".") else { return path }
+        let base = path[..<dotIndex]
+        let ext = path[dotIndex...]
+        return "\(base)_small\(ext)"
     }
 }
 
-// MARK: - Models
+// MARK: - Model
 struct PhotosResponse: Codable {
     let photos: [String]
 }
 
 #Preview {
     GalleryDetailView(
-        collection: GalleryCollection(name: "Halloween", thumbnail: "/media/gallery/thumbnail.jpg")
+        collection: GalleryCollection(name: "70's Shoot", thumbnail: "/media/gallery/70's%20Shoot/thumbnail.jpg")
     )
 }
-

@@ -1,10 +1,3 @@
-//
-//  GalleryView.swift
-//  Shroons iOS App
-//
-//  Created by Eric on 10/25/25.
-//
-
 import SwiftUI
 
 struct GalleryView: View {
@@ -43,22 +36,14 @@ struct GalleryView: View {
                                         VStack(spacing: 0) {
                                             GeometryReader { geometry in
                                                 let width = geometry.size.width
-                                                let height = width * 2/3 // make sure the image is a cropped 3:2 ratio
+                                                let height = width * 2/3 // 3:2 ratio
                                                 
                                                 ZStack {
                                                     if let url = URL(string: "https://shroons.com" + collection.thumbnail) {
-                                                        AsyncImage(url: url) { image in
-                                                            image
-                                                                .resizable()
-                                                                .scaledToFill()
-                                                                .frame(width: width, height: height)
-                                                                .clipped()
-                                                        } placeholder: {
-                                                            Rectangle()
-                                                                .fill(Color.gray.opacity(0.2))
-                                                                .frame(width: width, height: height)
-                                                                .overlay(ProgressView())
-                                                        }
+                                                        // Use RetryAsyncImage instead of AsyncImage
+                                                        RetryAsyncImage(url: url, maxRetries: 3, retryDelay: 1.5)
+                                                            .frame(width: width, height: height)
+                                                            .clipped()
                                                     }
                                                 }
                                                 .cornerRadius(12)
