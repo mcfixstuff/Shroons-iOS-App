@@ -22,7 +22,7 @@ struct GalleryView: View {
                         .progressViewStyle(CircularProgressViewStyle())
                 } else if let error = viewModel.errorMessage {
                     VStack(spacing: 12) {
-                        Text("⚠️ Error Loading Gallery")
+                        Text("Error Loading Gallery")
                             .font(.headline)
                         Text(error)
                             .font(.subheadline)
@@ -43,7 +43,7 @@ struct GalleryView: View {
                                         VStack(spacing: 0) {
                                             GeometryReader { geometry in
                                                 let width = geometry.size.width
-                                                let height = width * 2/3 // 3:2 ratio
+                                                let height = width * 2/3 // make sure the image is a cropped 3:2 ratio
                                                 
                                                 ZStack {
                                                     if let url = URL(string: "https://shroons.com" + collection.thumbnail) {

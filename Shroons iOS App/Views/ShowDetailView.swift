@@ -30,7 +30,7 @@ struct ShowDetailView: View {
                     Text(show.title)
                         .font(.title)
                         .bold()
-                        .foregroundColor(.primary) // Ensure black text
+                        .foregroundColor(.primary)
 
                     if let location = show.location, !location.isEmpty {
                         Text(location)
@@ -50,10 +50,10 @@ struct ShowDetailView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Additional Information")
                             .font(.headline)
-                            .foregroundColor(.primary) // Ensure black text
+                            .foregroundColor(.primary)
                         Text(info)
                             .font(.body)
-                            .foregroundColor(.primary) // Ensure black text
+                            .foregroundColor(.primary)
                     }
                     .padding(.horizontal)
                 }
@@ -62,7 +62,7 @@ struct ShowDetailView: View {
                 if let cost = show.cost {
                     Text(cost == 0 ? "Cost: Free!" : "Cost: $\(cost)")
                         .font(.body)
-                        .foregroundColor(.primary) // Ensure black text
+                        .foregroundColor(.primary)
                         .padding(.horizontal)
                 }
 
@@ -108,7 +108,7 @@ struct ShowDetailView: View {
             .padding(.top)
         }
         .navigationTitle(show.title)
-        .navigationBarBackButtonHidden(false) // Ensure back button is visible
+        .navigationBarBackButtonHidden(false)
     }
 }
 

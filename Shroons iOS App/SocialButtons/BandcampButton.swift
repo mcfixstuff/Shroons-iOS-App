@@ -18,7 +18,7 @@ struct BandcampButton: View {
     var body: some View {
         Button(action: openBandcamp) {
             HStack {
-                Image(systemName: "music.note") // simple icon, Bandcamp logo isn’t in SF Symbols
+                Image(systemName: "music.note")
                     .foregroundColor(.white)
                 Text("The Shroons on Bandcamp")
                     .fontWeight(.semibold)
