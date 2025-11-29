@@ -1,88 +1,133 @@
 import SwiftUI
 
 struct AboutView: View {
-    // URL of the image
     let heroImageURL = URL(string: "https://shroons.com/media/gallery/70%27s%20Shoot/thumbnail.jpg")
-
+    
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                // Remote image with async loading
+            VStack(spacing: 0) {
+                // Hero Image
                 if let url = heroImageURL {
                     AsyncImage(url: url) { phase in
                         switch phase {
                         case .empty:
                             ProgressView()
-                                .frame(height: 240)
+                                .frame(height: 280)
+                                .frame(maxWidth: .infinity)
+                                .background(Color(.systemGray6))
                         case .success(let image):
                             image
                                 .resizable()
                                 .scaledToFill()
-                                .frame(height: 240)
+                                .frame(height: 280)
                                 .clipped()
-                                .cornerRadius(12)
-                                .padding()
                         case .failure:
                             Image(systemName: "photo")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 240)
-                                .foregroundColor(.gray)
+                                .font(.system(size: 60))
+                                .foregroundColor(.secondary)
+                                .frame(height: 280)
+                                .frame(maxWidth: .infinity)
+                                .background(Color(.systemGray6))
                         @unknown default:
                             EmptyView()
                         }
                     }
                 }
-
-                Text("About The Shroons")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-
-                Text("""
-The Shroons are a powerhouse trio that brings the raw energy of the ’70s to the modern stage. Their original catalog is deeply rooted in the legendary sounds of rock, soul and psychedelia.
-""")
-                    .font(.body)
-                    .multilineTextAlignment(.leading)
-                    .padding(.horizontal)
-
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("The Sound")
-                        .font(.headline)
-                    Text("""
-Blazing guitars, thunderous grooves and soulful vocals merge into something both familiar and brand new — equal parts nostalgia and freshness.
-""")
-                        .font(.body)
-
-                    Text("On Stage")
-                        .font(.headline)
-                    Text("""
-When they hit the stage, The Shroons deliver high-octane performances full of energy, improvisation and chemistry. They thrive in clubs, theaters and outdoor festival settings alike.
-""")
-                        .font(.body)
-
-                    Text("Join the Experience")
-                        .font(.headline)
-                    Text("""
-Stay tuned for upcoming shows, releases and more. The journey’s just getting started — and you’re invited.
-""")
-                        .font(.body)
-                    InstagramButton()
-                    TikTokButton()
-                    YouTubeButton(channelHandle: "theshroons")
-                           YouTubeButton(channelHandle: "TheShroonsVault")
-                    FacebookButton()
-                    SpotifyButton()
-                    BandcampButton()
+                
+                // Content
+                VStack(spacing: 20) {
+                    // Main Description Block
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("About The Shroons")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        
+                        Text("The Shroons are a powerhouse trio that brings the raw energy of the '70s to the modern stage. Their original catalog is deeply rooted in the legendary sounds of rock, soul and psychedelia.")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                    )
+                    .padding(.horizontal, 16)
+                    
+                    // The Sound Block
+                    InfoBlock(
+                        title: "The Sound",
+                        description: "Blazing guitars, thunderous grooves and soulful vocals merge into something both familiar and brand new — equal parts nostalgia and freshness."
+                    )
+                    
+                    // On Stage Block
+                    InfoBlock(
+                        title: "On Stage",
+                        description: "When they hit the stage, The Shroons deliver high-octane performances full of energy, improvisation and chemistry. They thrive in clubs, theaters and outdoor festival settings alike."
+                    )
+                    
+                    // Join the Experience Block
+                    InfoBlock(
+                        title: "Join the Experience",
+                        description: "Stay tuned for upcoming shows, releases and more. The journey's just getting started — and you're invited."
+                    )
+                    
+                    // Social Links Block
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Connect")
+                            .font(.headline)
+                        
+                        VStack(spacing: 12) {
+                            InstagramButton()
+                            TikTokButton()
+                            YouTubeButton(channelHandle: "theshroons")
+                            YouTubeButton(channelHandle: "TheShroonsVault")
+                            FacebookButton()
+                            SpotifyButton()
+                            BandcampButton()
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                    )
+                    .padding(.horizontal, 16)
                 }
-                .padding(.horizontal)
-
-                Spacer(minLength: 40)
+                .padding(.vertical, 20)
+                .background(Color(.systemGroupedBackground))
             }
-            .padding(.vertical)
         }
+        .background(Color(.systemGroupedBackground))
         .navigationTitle("About")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// Indented block component for info sections
+struct InfoBlock: View {
+    let title: String
+    let description: String
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.headline)
+            Text(description)
+                .font(.body)
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+        )
+        .padding(.horizontal, 16)
     }
 }
 
