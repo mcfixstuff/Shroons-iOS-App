@@ -21,6 +21,7 @@ struct ShowsView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.top, 100)
                     } else if let error = viewModel.errorMessage {
+                        //added retry loading, and small graphic when not loading
                         VStack(spacing: 20) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.system(size: 50))
@@ -49,10 +50,12 @@ struct ShowsView: View {
                         .padding(.top, 80)
                         .padding(.horizontal, 32)
                     } else {
+                        //LazyVStack only shows needed shows
                         LazyVStack(spacing: 32, pinnedViews: []) {
                             // Upcoming Shows Section
                             if !viewModel.upcoming.isEmpty {
                                 LazyVStack(alignment: .leading, spacing: 16, pinnedViews: []) {
+                                    //small graphics showing ammount of shows
                                     HStack {
                                         Image(systemName: "calendar.badge.clock")
                                             .foregroundColor(.accentColor)
