@@ -20,7 +20,9 @@ struct AboutView: View {
                                 .resizable()
                                 .scaledToFill()
                                 .frame(height: 280)
+                                .cornerRadius(12)
                                 .clipped()
+                                .padding()
                         case .failure:
                             Image(systemName: "photo")
                                 .font(.system(size: 60))
