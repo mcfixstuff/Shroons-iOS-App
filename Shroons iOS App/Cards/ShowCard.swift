@@ -27,25 +27,28 @@ struct ShowCard: View {
                                 .clipped()
                                 .cornerRadius(12)
                         } placeholder: {
-                            Image(systemName: "photo")
+                            Image("noPoster")
                                 .resizable()
-                                .scaledToFit()
-                                .frame(width: 50, height: 50)
-                                .foregroundColor(.white.opacity(0.7))
+                                .scaledToFill()
+                                .frame(width: 80, height: 80)
+                                .clipped()
+                                .cornerRadius(12)
                         }
                     } else {
-                        Image(systemName: "photo")
+                        Image("noPoster")
                             .resizable()
-                            .scaledToFit()
-                            .frame(width: 50, height: 50)
-                            .foregroundColor(.white.opacity(0.7))
+                            .scaledToFill()
+                            .frame(width: 80, height: 80)
+                            .clipped()
+                            .cornerRadius(12)
                     }
                 } else {
-                    Image(systemName: "photo")
+                    Image("noPoster")
                         .resizable()
-                        .scaledToFit()
-                        .frame(width: 50, height: 50)
-                        .foregroundColor(.white.opacity(0.7))
+                        .scaledToFill()
+                        .frame(width: 80, height: 80)
+                        .clipped()
+                        .cornerRadius(12)
                 }
             }
             
