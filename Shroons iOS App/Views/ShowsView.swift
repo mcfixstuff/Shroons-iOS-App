@@ -5,57 +5,150 @@ struct ShowsView: View {
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                if viewModel.isLoading {
-                    ProgressView("Loading Shows...")
-                        .padding(.top, 50)
-                } else if let error = viewModel.errorMessage {
-                    VStack {
-                        Text(error)
-                            .foregroundColor(.red)
-                            .padding()
-                        Button("Retry") {
-                            Task { await viewModel.fetchShows() }
+            ZStack {
+                Color(.systemGroupedBackground)
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    if viewModel.isLoading {
+                        VStack(spacing: 16) {
+                            ProgressView()
+                                .scaleEffect(1.2)
+                            Text("Loading Shows...")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
                         }
-                    }
-                } else {
-                    VStack(alignment: .leading, spacing: 24) {
-                        if !viewModel.upcoming.isEmpty {
-                            Text("Upcoming Shows")
-                                .font(.title2)
-                                .bold()
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 100)
+                    } else if let error = viewModel.errorMessage {
+                        //added retry loading, and small graphic when not loading
+                        VStack(spacing: 20) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.system(size: 50))
+                                .foregroundColor(.orange)
+                            
+                            Text("Unable to Load Shows")
+                                .font(.headline)
+                            
+                            Text(error)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
                                 .padding(.horizontal)
-                            ForEach(viewModel.upcoming) { show in
-                                NavigationLink(
-                                    destination: ShowDetailView(show: show),
-                                    label: {
-                                        ShowCard(show: show)
-                                            .foregroundColor(.primary)
-                                    }
-                                )
+                            
+                            Button(action: {
+                                Task { await viewModel.fetchShows() }
+                            }) {
+                                Text("Try Again")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                    .frame(width: 140, height: 44)
+                                    .background(Color.accentColor)
+                                    .cornerRadius(10)
                             }
                         }
-
-                        if !viewModel.past.isEmpty {
-                            Text("Past Shows")
-                                .font(.title2)
-                                .bold()
-                                .padding(.horizontal)
-                            ForEach(viewModel.past) { show in
-                                NavigationLink(
-                                    destination: ShowDetailView(show: show),
-                                    label: {
-                                        ShowCard(show: show)
-                                            .foregroundColor(.primary)
+                        .padding(.top, 80)
+                        .padding(.horizontal, 32)
+                    } else {
+                        //LazyVStack only shows needed shows
+                        LazyVStack(spacing: 32, pinnedViews: []) {
+                            // Upcoming Shows Section
+                            if !viewModel.upcoming.isEmpty {
+                                LazyVStack(alignment: .leading, spacing: 16, pinnedViews: []) {
+                                    //small graphics showing ammount of shows
+                                    HStack {
+                                        Image(systemName: "calendar.badge.clock")
+                                            .foregroundColor(.accentColor)
+                                        Text("Upcoming Shows")
+                                            .font(.title2)
+                                            .fontWeight(.bold)
+                                        Spacer()
+                                        Text("\(viewModel.upcoming.count)")
+                                            .font(.caption)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.secondary)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 4)
+                                            .background(Color(.systemGray5))
+                                            .cornerRadius(8)
                                     }
-                                )
+                                    .padding(.horizontal, 20)
+                                    // Lazy stack (Only load needed shows)
+                                    LazyVStack(spacing: 12) {
+                                        ForEach(viewModel.upcoming) { show in
+                                            NavigationLink(destination: ShowDetailView(show: show)) {
+                                                ShowCard(show: show)
+                                                    .foregroundColor(.primary)
+                                            }
+                                            .buttonStyle(PlainButtonStyle())
+                                        }
+                                    }
+                                    .padding(.horizontal, 16)
+                                }
+                            }
+                            
+                            // Past Shows Section
+                            if !viewModel.past.isEmpty {
+                                LazyVStack(alignment: .leading, spacing: 16, pinnedViews: []) {
+                                    HStack {
+                                        Image(systemName: "calendar")
+                                            .foregroundColor(.secondary)
+                                        Text("Past Shows")
+                                            .font(.title2)
+                                            .fontWeight(.bold)
+                                        Spacer()
+                                        Text("\(viewModel.past.count)")
+                                            .font(.caption)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.secondary)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 4)
+                                            .background(Color(.systemGray5))
+                                            .cornerRadius(8)
+                                    }
+                                    .padding(.horizontal, 20)
+                                    
+                                    LazyVStack(spacing: 12) {
+                                        ForEach(viewModel.past) { show in
+                                            NavigationLink(destination: ShowDetailView(show: show)) {
+                                                ShowCard(show: show)
+                                                    .foregroundColor(.primary)
+                                            }
+                                            .buttonStyle(PlainButtonStyle())
+                                        }
+                                    }
+                                    .padding(.horizontal, 16)
+                                }
+                            }
+                            
+                            // Empty state if no shows
+                            if viewModel.upcoming.isEmpty && viewModel.past.isEmpty {
+                                VStack(spacing: 16) {
+                                    Image(systemName: "calendar.badge.exclamationmark")
+                                        .font(.system(size: 60))
+                                        .foregroundColor(.secondary)
+                                    
+                                    Text("No Shows Scheduled")
+                                        .font(.headline)
+                                    
+                                    Text("Check back soon for upcoming performances!")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.center)
+                                }
+                                .padding(.top, 100)
+                                .padding(.horizontal, 32)
                             }
                         }
+                        .padding(.vertical, 20)
                     }
-                    .padding(.vertical)
+                }
+                .refreshable {
+                    await viewModel.fetchShows()
                 }
             }
-            .navigationTitle("The Shroons Shows")
+            .navigationTitle("Shows")
+            .navigationBarTitleDisplayMode(.large)
             .task {
                 await viewModel.fetchShows()
             }
